@@ -1,0 +1,152 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Glass effect */
+.glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Custom scrollbar */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+/* React Flow customizations */
+.react-flow__node {
+  @apply transition-transform duration-300;
+}
+
+.react-flow__node:hover {
+  @apply scale-105;
+}
+
+.react-flow__edge {
+  @apply opacity-30 hover:opacity-60 transition-opacity duration-300;
+}
+
+.react-flow__controls button {
+  @apply bg-white/5 border-white/10 hover:bg-white/10 transition-colors duration-300;
+}
+
+.react-flow__controls button path {
+  @apply fill-white/60;
+}
+
+/* Hide React Flow attribution */
+.react-flow__attribution {
+  display: none;
+}
+
+:root {
+  --background: #000000;
+  --text: #e2e8f0;
+}
+
+body {
+  color: var(--text);
+  background: var(--background);
+}
+
+/* Custom styles for the force graph */
+.force-graph-container {
+  width: 100vw !important;
+  height: 100vh !important;
+}
+
+.force-graph-container canvas {
+  outline: none;
+}
+
+/* Enhanced glass effect with glimmer */
+.glass {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 8px 32px 0 rgba(0, 0, 0, 0.2),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  position: relative;
+}
+
+.glass::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.05) 20%,
+    transparent 60%
+  );
+  transform: rotate(-45deg);
+  animation: glimmer 10s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes glimmer {
+  0% {
+    transform: rotate(-45deg) translateY(0%);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.5;
+  }
+  50% {
+    transform: rotate(-45deg) translateY(-25%);
+    opacity: 0;
+  }
+  100% {
+    transform: rotate(-45deg) translateY(-50%);
+    opacity: 0;
+  }
+}
+
+/* Ensure images don't overflow */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Custom scrollbar for the sidebar */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}

@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+__pycache__/
+
+# Large data files
+frontend/public/data/*.json
+backend/*.json
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build outputs
+.next/
+build/
+dist/
+
+# System files
+.DS_Store
+*.log
