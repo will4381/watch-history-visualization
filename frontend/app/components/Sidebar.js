@@ -43,144 +43,68 @@ const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
+    day: 'numeric'
   });
 };
 
-export default function Sidebar({ clusters, selectedCluster, onSelectCluster }) {
-  // Get color for cluster (same function as in FlowCanvas)
-  const getClusterColor = (clusterId) => {
-    if (clusterId === -1) return '#6C757D';
-    const hue = (clusterId * 137.508) % 360;
-    return `hsl(${hue}, 70%, 60%)`;
-  };
+export default function Sidebar({ selectedCluster }) {
+  // Early return if no cluster is selected
+  if (!selectedCluster) {
+    return (
+      <div className="fixed top-6 right-6 bottom-6 w-96 bg-black/80 backdrop-blur-lg border border-white/10 rounded-2xl z-50 p-6">
+        <div className="flex items-center justify-center h-full text-white/60">
+          Select a cluster to view videos
+        </div>
+      </div>
+    );
+  }
 
   // Sort videos by timestamp (most recent first)
   const sortedVideos = useMemo(() => {
-    if (!selectedCluster) return [];
-    return [...selectedCluster.videos].sort(
-      (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
-    );
-  }, [selectedCluster]);
-
-  // Group videos by channel
-  const channelStats = useMemo(() => {
-    if (!selectedCluster) return [];
-    const channels = new Map();
-    selectedCluster.videos.forEach(video => {
-      if (!channels.has(video.channelName)) {
-        channels.set(video.channelName, 0);
-      }
-      channels.set(video.channelName, channels.get(video.channelName) + 1);
-    });
-    return Array.from(channels.entries())
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5); // Top 5 channels
+    return [...selectedCluster.videos]
+      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+      .slice(0, 100); // Limit to 100 videos for performance
   }, [selectedCluster]);
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: '1.5rem',
-        right: '1.5rem',
-        bottom: '1.5rem',
-        width: '24rem'
-      }}
-      className="bg-black/80 backdrop-blur-lg border border-white/10 rounded-2xl z-50 custom-scrollbar overflow-y-auto"
-    >
-      <div className="p-6 space-y-6">
-        {/* Clusters List */}
-        <div>
-          <h2 className="text-2xl font-bold text-white/90 mb-4">Clusters</h2>
-          <div className="space-y-2">
-            {clusters.map(cluster => (
-              <button
-                key={cluster.id}
-                onClick={() => onSelectCluster(cluster)}
-                className={`w-full text-left p-4 rounded-xl backdrop-blur-sm transition-colors ${
-                  selectedCluster?.id === cluster.id 
-                    ? 'bg-white/10' 
-                    : 'bg-white/5 hover:bg-white/8'
-                }`}
-                style={{
-                  borderLeft: `4px solid ${getClusterColor(cluster.id)}`
-                }}
-              >
-                <h3 className="font-medium text-white/90">{cluster.name}</h3>
-                <p className="text-sm text-white/60">
-                  {cluster.videos.length.toLocaleString()} videos
-                </p>
-              </button>
-            ))}
-          </div>
-        </div>
+    <div className="fixed top-6 right-6 bottom-6 w-96 bg-black/80 backdrop-blur-lg border border-white/10 rounded-2xl z-50 overflow-hidden flex flex-col">
+      {/* Header */}
+      <div className="p-6 border-b border-white/10">
+        <h2 className="text-xl font-bold text-white/90">
+          {selectedCluster.videos.length.toLocaleString()} Videos
+        </h2>
+      </div>
 
-        {/* Selected Cluster Details */}
-        {selectedCluster && (
-          <>
-            <div className="h-px bg-white/10" />
-            
-            {/* Top Channels */}
-            <div>
-              <h3 className="text-lg font-semibold text-white/80 mb-3">
-                Top Channels
-              </h3>
-              <div className="space-y-2">
-                {channelStats.map(([channel, count]) => (
-                  <div
-                    key={channel}
-                    className="bg-white/5 rounded-xl p-3 backdrop-blur-sm"
-                  >
-                    <h4 className="font-medium text-white/90">{channel}</h4>
-                    <p className="text-sm text-white/60">
-                      {count} {count === 1 ? 'video' : 'videos'}
-                    </p>
-                  </div>
-                ))}
-              </div>
+      {/* Video List */}
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-3">
+        {sortedVideos.map((video) => (
+          <a
+            key={`${video.videoId}-${video.timestamp}`}
+            href={`https://youtube.com/watch?v=${video.videoId}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex gap-3 bg-white/5 rounded-xl p-3 backdrop-blur-sm hover:bg-white/10 transition-colors group"
+          >
+            <div className="relative w-24 h-16 flex-shrink-0 overflow-hidden rounded-lg">
+              <VideoThumbnail
+                src={video.thumbnailUrl}
+                alt={video.title}
+                className="object-cover group-hover:scale-105 transition-transform duration-200"
+              />
             </div>
-
-            {/* Video List */}
-            <div>
-              <h3 className="text-lg font-semibold text-white/80 mb-3">
-                Recent Videos
-              </h3>
-              <div className="space-y-3">
-                {sortedVideos.map((video) => (
-                  <a
-                    key={`${video.videoId}-${video.timestamp}`}
-                    href={`https://youtube.com/watch?v=${video.videoId}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex gap-3 bg-white/5 rounded-xl p-3 backdrop-blur-sm hover:bg-white/10 transition-colors"
-                  >
-                    <div className="relative w-24 h-16 flex-shrink-0">
-                      <VideoThumbnail
-                        src={video.thumbnailUrl}
-                        alt={video.title}
-                        className="rounded-lg object-cover"
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-white/90 text-sm truncate">
-                        {video.title}
-                      </h4>
-                      <p className="text-xs text-white/60 truncate">
-                        {video.channelName}
-                      </p>
-                      <p className="text-xs text-white/40 mt-1">
-                        {formatDate(video.timestamp)}
-                      </p>
-                    </div>
-                  </a>
-                ))}
-              </div>
+            <div className="flex-1 min-w-0">
+              <h4 className="font-medium text-white/90 text-sm line-clamp-2">
+                {video.title}
+              </h4>
+              <p className="text-xs text-white/60 mt-1 truncate">
+                {video.channelName}
+              </p>
+              <p className="text-xs text-white/40 mt-0.5">
+                {formatDate(video.timestamp)}
+              </p>
             </div>
-          </>
-        )}
+          </a>
+        ))}
       </div>
     </div>
   );
